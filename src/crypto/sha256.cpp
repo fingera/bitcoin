@@ -715,6 +715,42 @@ CSHA256& CSHA256::Reset()
     return *this;
 }
 
+
+void SHA256D648Way(unsigned char* out, const unsigned char* in, size_t blocks)
+{
+    if (TransformD64_8way) {
+        while (blocks >= 8) {
+            TransformD64_8way(out, in);
+            out += 256;
+            in += 512;
+            blocks -= 8;
+        }
+    }
+    if (TransformD64_4way) {
+        while (blocks >= 4) {
+            TransformD64_4way(out, in);
+            out += 128;
+            in += 256;
+            blocks -= 4;
+        }
+    }
+    if (TransformD64_2way) {
+        while (blocks >= 2) {
+            TransformD64_2way(out, in);
+            out += 64;
+            in += 128;
+            blocks -= 2;
+        }
+    }
+    while (blocks) {
+        TransformD64(out, in);
+        out += 32;
+        in += 64;
+        --blocks;
+    }
+}
+
+
 void SHA256D64(unsigned char* out, const unsigned char* in, size_t blocks)
 {
     if (TransformD64_16way) {

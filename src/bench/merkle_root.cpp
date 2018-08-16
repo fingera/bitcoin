@@ -8,7 +8,7 @@
 #include <random.h>
 #include <consensus/merkle.h>
 
-static void MerkleRoot(benchmark::State& state)
+static void FINGERA_MerkleRoot(benchmark::State& state)
 {
     FastRandomContext rng(true);
     std::vector<uint256> leaves;
@@ -23,4 +23,21 @@ static void MerkleRoot(benchmark::State& state)
     }
 }
 
-BENCHMARK(MerkleRoot, 800);
+uint256 ComputeMerkleRoot8Way(std::vector<uint256> hashes, bool* mutated);
+static void FINGERA_MerkleRoot8Way(benchmark::State& state)
+{
+    FastRandomContext rng(true);
+    std::vector<uint256> leaves;
+    leaves.resize(9001);
+    for (auto& item : leaves) {
+        item = rng.rand256();
+    }
+    while (state.KeepRunning()) {
+        bool mutation = false;
+        uint256 hash = ComputeMerkleRoot8Way(std::vector<uint256>(leaves), &mutation);
+        leaves[mutation] = hash;
+    }
+}
+
+BENCHMARK(FINGERA_MerkleRoot, 800);
+BENCHMARK(FINGERA_MerkleRoot8Way, 800);

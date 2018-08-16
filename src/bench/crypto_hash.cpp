@@ -52,11 +52,12 @@ static void SHA256_32b(benchmark::State& state)
     }
 }
 
-static void SHA256D64_1024(benchmark::State& state)
+void SHA256D648Way(unsigned char* out, const unsigned char* in, size_t blocks);
+static void FINGERA_SHA256D64_1024(benchmark::State& state)
 {
     std::vector<uint8_t> in(64 * 1024, 0);
     while (state.KeepRunning()) {
-        SHA256D64(in.data(), in.data(), 1024);
+        SHA256D648Way(in.data(), in.data(), 1024);
     }
 }
 
@@ -102,6 +103,6 @@ BENCHMARK(SHA512, 330);
 
 BENCHMARK(SHA256_32b, 4700 * 1000);
 BENCHMARK(SipHash_32b, 40 * 1000 * 1000);
-BENCHMARK(SHA256D64_1024, 7400);
+BENCHMARK(FINGERA_SHA256D64_1024, 7400);
 BENCHMARK(FastRandom_32bit, 110 * 1000 * 1000);
 BENCHMARK(FastRandom_1bit, 440 * 1000 * 1000);
