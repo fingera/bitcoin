@@ -9,7 +9,7 @@
 #include <support/cleanse.h>
 #ifdef WIN32
 #include <compat.h> // for Windows API
-#include <wincrypt.h>
+#include <bcrypt.h>
 #endif
 #include <logging.h>  // for LogPrint()
 #include <utiltime.h> // for GetTime()
@@ -203,16 +203,16 @@ static void GetDevURandom(unsigned char *ent32)
 void GetOSRand(unsigned char *ent32)
 {
 #if defined(WIN32)
-    HCRYPTPROV hProvider;
-    int ret = CryptAcquireContextW(&hProvider, nullptr, nullptr, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT);
+    BCRYPT_ALG_HANDLE hProvider;
+    int ret = BCryptOpenAlgorithmProvider(&hProvider, BCRYPT_RNG_ALGORITHM, NULL, 0);
     if (!ret) {
         RandFailure();
     }
-    ret = CryptGenRandom(hProvider, NUM_OS_RANDOM_BYTES, ent32);
+    ret = BCryptGenRandom(hProvider, ent32, NUM_OS_RANDOM_BYTES, 0);
     if (!ret) {
         RandFailure();
     }
-    CryptReleaseContext(hProvider, 0);
+    BCryptCloseAlgorithmProvider(hProvider, 0);
 #elif defined(HAVE_SYS_GETRANDOM)
     /* Linux. From the getrandom(2) man page:
      * "If the urandom source has been initialized, reads of up to 256 bytes
