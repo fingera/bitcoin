@@ -204,12 +204,12 @@ void GetOSRand(unsigned char *ent32)
 {
 #if defined(WIN32)
     BCRYPT_ALG_HANDLE hProvider;
-    int ret = BCryptOpenAlgorithmProvider(&hProvider, BCRYPT_RNG_ALGORITHM, NULL, 0);
-    if (ret) {
+    NTSTATUS ret = BCryptOpenAlgorithmProvider(&hProvider, BCRYPT_RNG_ALGORITHM, NULL, 0);
+    if (ret != STATUS_SUCCESS) {
         RandFailure();
     }
     ret = BCryptGenRandom(hProvider, ent32, NUM_OS_RANDOM_BYTES, 0);
-    if (ret) {
+    if (ret != STATUS_SUCCESS) {
         RandFailure();
     }
     BCryptCloseAlgorithmProvider(hProvider, 0);
